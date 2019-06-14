@@ -13,14 +13,14 @@ import junit.framework.TestSuite;
 /**
  * Unit test harness for LexEVS Service (CTS2/REST) API
  */
-public class LexevsRestTestRunner extends TestCase
+public class LexevsRestTestRunnerTest extends TestCase
 {
     /**
      * Create the test case
      *
      * @param testName name of the test case
      */
-    public LexevsRestTestRunner( String testName )
+    public LexevsRestTestRunnerTest( String testName )
     {
         super( testName );
     }
@@ -30,7 +30,7 @@ public class LexevsRestTestRunner extends TestCase
      */
     public static Test suite()
     {
-        return new TestSuite( LexevsRestTestRunner.class );
+        return new TestSuite( LexevsRestTestRunnerTest.class );
     }
     
     protected void setUp() throws Exception {
