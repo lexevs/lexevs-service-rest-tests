@@ -190,6 +190,24 @@ public class LexevsRestTestRunnerTest extends TestCase
 	}
 		
 	//*********************************************************************
+	// codeSystem entities - search entities - resourceSynopsis, contains 
+	//*********************************************************************
+	public final void test_entity_search_resource_synopsis_contains_call() {
+		
+		RestAssured.
+			when().
+				get("codesystem/MedDRA/version/19.0/entities?matchvalue=Cleft&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).					
+					body("EntityDirectory.complete", is("COMPLETE"),
+						 "EntityDirectory.numEntries", is(43),
+						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10009269' }.name.name", equalTo("10009269"),
+						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10009276' }.name.name", equalTo("10009276"),
+						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10009264' }.name.name", equalTo("10009264"));
+	}
+		
+	//*********************************************************************
 	// codesystem entities - read
 	//*********************************************************************
 	public final void test_entities_read_call() {
