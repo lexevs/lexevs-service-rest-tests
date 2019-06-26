@@ -206,6 +206,22 @@ public class LexevsRestTestRunnerTest extends TestCase
 						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10009276' }.name.name", equalTo("10009276"),
 						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10009264' }.name.name", equalTo("10009264"));
 	}
+	
+	//*********************************************************************
+	// codeSystem entities - search entities - resourceSynopsis, exactMatch 
+	//*********************************************************************
+	public final void test_entity_search_resource_synopsis_exact_match_call() {
+		
+		RestAssured.
+			when().
+				get("codesystem/MedDRA/version/19.0/entities?matchvalue=Cleft lip and nose&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).					
+					body("EntityDirectory.complete", is("COMPLETE"),
+						 "EntityDirectory.numEntries", is(1),
+						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10068280' }.name.name", equalTo("10068280"));
+	}
 		
 	//*********************************************************************
 	// codesystem entities - read
