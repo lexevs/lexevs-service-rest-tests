@@ -6,6 +6,11 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import io.restassured.RestAssured;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -16,18 +21,16 @@ import junit.framework.TestSuite;
  */
 public class LexevsRestTestRunnerTest extends TestCase
 {
-	// These variables should be pulled from a properties file.
+	// These variables are set from a properties file.
+	public static String BASE_URL;
+	public static String BASE_PATH;
 	
-	public static final String BASE_URL = "https://lexevs65cts2.nci.nih.gov";
-	public static final String BASE_PATH = "/lexevscts2";
+	public static String LEXEVS_SERVICE_VERSION;
 	
-	public static final String LEXEVS_SERVICE_VERSION = "1.3.6.FINAL";
-	
-	public static final String THESAURUS_VERSION_NUMBER = "19.05d";
-	public static final String THESAURUS = "NCI_Thesaurus";
-	public static final String THESAURUS_VERSION = THESAURUS + "-" + THESAURUS_VERSION_NUMBER; 
-	
-	
+	public static String THESAURUS_VERSION_NUMBER;
+	public static String THESAURUS;
+	public static String THESAURUS_VERSION; 
+		
     /**
      * Create the test case
      *
@@ -36,6 +39,7 @@ public class LexevsRestTestRunnerTest extends TestCase
     public LexevsRestTestRunnerTest( String testName )
     {
         super( testName );
+        getProperties();
     }
 
     /**
@@ -47,15 +51,15 @@ public class LexevsRestTestRunnerTest extends TestCase
     }
     
     protected void setUp() throws Exception {
-    	
+       	    	
     	// Default the URL to prod, stage, ...
 		RestAssured.baseURI = BASE_URL;
 		
 		// Default the base path that is appended to the base URL
     	RestAssured.basePath = BASE_PATH;
 	}
-	
-    //*********************************************************************
+	    
+	//*********************************************************************
  	// service
  	//*********************************************************************
 	public final void test_service_call() {
@@ -729,4 +733,42 @@ public class LexevsRestTestRunnerTest extends TestCase
 						 "MapEntryMsg.entry.assertedBy.map.content", equalTo("NCIt_to_ChEBI_Mapping"),
 						 "MapEntryMsg.entry.mapFrom.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C1028"));
 	 }
+	
+    /**
+     * Read the properties file and set the variables.
+     */
+    private void getProperties() {
+    	InputStream inputStream = null;
+    	
+    	try {
+			Properties prop = new Properties();
+			String propFileName = "config.properties";
+ 
+			inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+ 
+			if (inputStream != null) {
+				prop.load(inputStream);
+			} else {
+				throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+			}
+ 
+			// get the property values
+			BASE_URL = prop.getProperty("BASE_URL");
+			BASE_PATH = prop.getProperty("BASE_PATH");
+			LEXEVS_SERVICE_VERSION = prop.getProperty("LEXEVS_SERVICE_VERSION");
+			THESAURUS_VERSION_NUMBER = prop.getProperty("THESAURUS_VERSION_NUMBER");
+			THESAURUS = prop.getProperty("THESAURUS");
+			
+			THESAURUS_VERSION = THESAURUS + "-" + THESAURUS_VERSION_NUMBER; 
+			
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		} finally {
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
