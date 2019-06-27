@@ -22,14 +22,14 @@ import junit.framework.TestSuite;
 public class LexevsRestTestRunnerTest extends TestCase
 {
 	// These variables are set from a properties file.
-	public static String BASE_URL;
-	public static String BASE_PATH;
+	public static String BASE_URL=null;
+	public static String BASE_PATH=null;
 	
-	public static String LEXEVS_SERVICE_VERSION;
+	public static String LEXEVS_SERVICE_VERSION=null;
 	
-	public static String THESAURUS_VERSION_NUMBER;
-	public static String THESAURUS;
-	public static String THESAURUS_VERSION; 
+	public static String THESAURUS_VERSION_NUMBER=null;
+	public static String THESAURUS=null;
+	public static String THESAURUS_VERSION=null;
 		
     /**
      * Create the test case
@@ -132,26 +132,149 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == '" + THESAURUS_VERSION + "' }.documentURI", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + THESAURUS_VERSION_NUMBER));
 	}
 	
-	
-	
 	//*********************************************************************
-	// codeSystemVersion - search starts with MDR (MedDRA)
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceSynopsis
+	//	 matchAlgorithm=contains
 	//*********************************************************************
-	public final void test_codeSystemVersion_search_starts_with_call() {
+	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
 		
 		RestAssured.
 			when().
-				get("/codesystemversions?matchvalue=MDR&filtercomponent=resourceName&matchalgorithm=startsWith&format=json").
+				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=contains&format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(17),
-  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'MDR-18.0' }.versionOf.content", equalTo("MDR"),
-  					   	 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'MDR-18.1' }.versionOf.content", equalTo("MDR"),
-  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'MDR-19.0' }.versionOf.content", equalTo("MDR"));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(4));
 	}
 	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceSynopsis
+	//	 matchAlgorithm=exactMatch
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(4));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceSynopsis
+	//	 matchAlgorithm=luceneQuery
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_luceneQuery_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=luceneQuery&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(4));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceSynopsis
+	//	 matchAlgorithm=starsWith
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_starsWith_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=startsWith&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(4));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceName
+	//	 matchAlgorithm=contains
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_contains_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceName
+	//	 matchAlgorithm=exactMatch
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_exactMatch_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceName
+	//	 matchAlgorithm=luceneQuery
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_luceneQuery_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=luceneQuery&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceName
+	//	 matchAlgorithm=starsWith
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_starsWith_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=startsWith&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
+	}
 	
 	//*********************************************************************
 	// codeSystem - retrieve exact match on THESAURUS_VERSION
@@ -738,6 +861,9 @@ public class LexevsRestTestRunnerTest extends TestCase
      * Read the properties file and set the variables.
      */
     private void getProperties() {
+    	
+    	if (BASE_URL != null) {return;} // properties already set.
+    	    	
     	InputStream inputStream = null;
     	
     	try {
