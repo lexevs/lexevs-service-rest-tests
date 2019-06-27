@@ -388,8 +388,11 @@ public class LexevsRestTestRunnerTest extends TestCase
 	
 	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - luceneQuery
+	//   matchvalue=heart
+	//   filtercomponent=resourceSynopsis
+	//   matchalgorithm=luceneQuery
 	//*********************************************************************
-	public final void test_entities_search_resource_synopsis_lucene_call() {
+	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_luceneQuery_call() {
 		
 		RestAssured.
 			when().
@@ -405,8 +408,11 @@ public class LexevsRestTestRunnerTest extends TestCase
 	
 	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - exactMatch
+	//   matchvalue=Heart disorder
+	//   filtercomponent=resourceSynopsis
+	//   matchalgorithm=exactMatch
 	//*********************************************************************
-	public final void test_entities_search_resource_synopsis_exact_match_call() {
+	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
 		
 		RestAssured.
 			when().
@@ -421,8 +427,11 @@ public class LexevsRestTestRunnerTest extends TestCase
 	
 	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - contains
+	//   matchvalue=Heart disorder
+	//   filtercomponent=resourceSynopsis
+	//   matchalgorithm=contains
 	//*********************************************************************
-	public final void test_entities_search_resource_synopsis_contains_call() {
+	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
 		
 		RestAssured.
 			when().
@@ -435,18 +444,19 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "EntityDirectory.entry.find { it.name.name = '10019277' }.name.namespace ", equalTo("MDR"),
   					  	 "EntityDirectory.entry.find { it.name.name = '10061158' }.name.namespace ", equalTo("MDR"));
 	}
-			
+	
 	//*********************************************************************
 	// entities - search resourceName, matchalgorithm - contains
 	// 
-	// ** Searches the designation for any part of the match value.  
-	// ** To see all designations, you need to retrieve the entity itself.
+	//   matchvalue=Heart disorder
+	//   filtercomponent=resourceName
+	//   matchalgorithm=luceneQuery
 	//*********************************************************************
-	public final void test_entities_search_resource_name_contains_call() {
+	public final void test_entities_search_filtercomponent_resourceName_matchAlgorithm_luceneQuery_call() {
 		
 		RestAssured.
 			when().
-				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=contains&maxtoreturn=50&format=json").
+				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=luceneQuery&maxtoreturn=50&format=json").
 			then().
 				assertThat().
 					statusCode(200).
@@ -457,18 +467,45 @@ public class LexevsRestTestRunnerTest extends TestCase
 	}
 	
 	//*********************************************************************
-	// entities - search resourceName, matchalgorithm - exactMatch
+	// entities - search resourceName, matchalgorithm - contains
 	// 
-	// ** Searches the designation for the match value.  
-	// ** To see all designations, you need to retrieve the entity itself.
+	//   matchvalue=Heart disorder
+	//   filtercomponent=resourceName
+	//   matchalgorithm=exactMatch
 	//
-	// ** ???? This seems to be doing a contains, not an exact match  ????
+	// ** Searches the designation for any part of the match value.  
+	// ** Appears to match on "disorder" and ignores the "heart" part of it.
+	// ** To see all designations, you need to retrieve the entity itself.
 	//*********************************************************************
-	public final void test_entities_search_resource_name_exact_match_call() {
+	public final void test_entities_search_filtercomponent_resourceName_matchAlgorithm_exactMatch_call() {
 		
 		RestAssured.
 			when().
 				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=exactMatch&maxtoreturn=50&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("EntityDirectory.complete", hasToString("PARTIAL"),
+  						 "EntityDirectory.numEntries", equalTo(50),
+  						 "EntityDirectory.entry.find { it.name.name = 'C1263846' }.name.namespace ", equalTo("ns1363824265"),
+  					  	 "EntityDirectory.entry.find { it.name.name = 'C0037274' }.name.namespace ", equalTo("ns1363824265"));
+	}
+	
+	//*********************************************************************
+	// entities - search resourceName, matchalgorithm - contains
+	// 
+	//   matchvalue=Heart disorder
+	//   filtercomponent=resourceName
+	//   matchalgorithm=contains
+	//
+	// ** Searches the designation for any part of the match value.  
+	// ** To see all designations, you need to retrieve the entity itself.
+	//*********************************************************************
+	public final void test_entities_search_filtercomponent_resourceName_matchAlgorithm_contains_call() {
+		
+		RestAssured.
+			when().
+				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=contains&maxtoreturn=50&format=json").
 			then().
 				assertThat().
 					statusCode(200).
