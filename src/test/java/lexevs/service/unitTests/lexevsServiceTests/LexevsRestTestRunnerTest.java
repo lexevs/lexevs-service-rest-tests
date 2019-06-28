@@ -893,25 +893,50 @@ public class LexevsRestTestRunnerTest extends TestCase
 				
 	//*********************************************************************
 	// mapversions - search resourceName
+	//  matchvalue=ncit
+    //  filtercomponent=resourceName
+	//  entitiesmaprole=MAP_FROM_ROLE
 	//*********************************************************************
-	public final void test_mapversions_search_resource_name_call() {
+	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_mapFromRole_call() {
 			
 		RestAssured.
 			when().
-				get("/mapversions?matchvalue=GO&filtercomponent=resourceName&format=json").
+				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_FROM_ROLE&format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
-						 "MapVersionDirectory.numEntries", equalTo(1),
+						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
+	 }
+	
+	//*********************************************************************
+	// mapversions - search resourceName
+	//  matchvalue=ncit
+    //  filtercomponent=resourceName
+	//  entitiesmaprole=MAP_TO_ROLE
+	//*********************************************************************
+	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_mapToRole_call() {
+			
+		RestAssured.
+			when().
+				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_TO_ROLE&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
+						 "MapVersionDirectory.numEntries", equalTo(4),
 						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
 						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
 	 }
 	
 	//*********************************************************************
 	// mapversions - search resourceSynopsis
+	//   matchvalue=NCIT
+    //   filtercomponent=resourceSynopsis
 	//*********************************************************************
-	public final void test_mapversions_search_resource_synopsis_call() {
+	public final void test_mapversions_search_filtercomponent_resourceSynopsis_call() {
 			
 		RestAssured.
 			when().
