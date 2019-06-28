@@ -117,7 +117,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 	//*********************************************************************
 	// codeSystemVersion - search exact match on THESAURUS_VERSION
 	//*********************************************************************
-	public final void test_codeSystemVersion_search_exact_match_call() {
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_exact_match_call() {
 		
 		RestAssured.
 			when().
@@ -275,6 +275,64 @@ public class LexevsRestTestRunnerTest extends TestCase
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
   						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
 	}
+	
+	
+	
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=EVS
+	//	 filtercomponent=about
+	//	 matchAlgorithm=contains
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_contains_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=EVS
+	//	 filtercomponent=about
+	//	 matchAlgorithm=startsWith
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_startsWith_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=startsWith&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=EVS
+	//	 filtercomponent=about
+	//	 matchAlgorithm=exactMatch
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_exactMatch_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
+	}
+
 	
 	//*********************************************************************
 	// codeSystem - retrieve exact match on THESAURUS_VERSION
