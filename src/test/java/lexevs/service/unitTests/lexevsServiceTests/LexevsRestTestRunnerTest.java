@@ -97,6 +97,21 @@ public class LexevsRestTestRunnerTest extends TestCase
 	}
 	
 	//*********************************************************************
+	// codeSystemVersion - search on unknown value.  Should get return of 0
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_return_none_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=foot&filtercomponent=resourceSynopsis&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
+	}
+	
+	//*********************************************************************
 	// codeSystemVersion - search "thesaurus"
 	//*********************************************************************
 	public final void test_codeSystemVersion_search_call() {
@@ -445,6 +460,24 @@ public class LexevsRestTestRunnerTest extends TestCase
 	}
 	
 	//*********************************************************************
+	// entities - search all for non-existing value
+	//   matchvalue=abcdef
+	//   filtercomponent=resourceSynopsis
+	//   matchalgorithm=contains
+	//*********************************************************************
+	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_invalid_value_call() {
+		
+		RestAssured.
+			when().
+				get("/entities?matchvalue=abcdef&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("EntityDirectory.complete", hasToString("COMPLETE"),
+  						 "EntityDirectory.numEntries", equalTo(0));
+	}
+	
+	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - luceneQuery
 	//   matchvalue=heart
 	//   filtercomponent=resourceSynopsis
@@ -684,8 +717,10 @@ public class LexevsRestTestRunnerTest extends TestCase
 	
 	//*********************************************************************
 	// valuesets - search resourceName, exact match
+	//   filtercomponent=resourceName
+	//   matchalgorithm=exactMatch
 	//*********************************************************************
-	public final void test_valuesets_search_resourceName_exactMatch_call() {
+	public final void test_valuesets_search_filtercomponent_resourceName_matchAlgorithm_exactMatch_call() {
 			
 		RestAssured.
 			when().
@@ -700,16 +735,51 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'GAIA Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("dbaa9b00"),
   					  	 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'GAIA Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/GAIA/C125481"));
 	 }
-		
-				
+	
 	//*********************************************************************
-	// valuesets - search resourceSynopsis, contains
+	// valuesets - search resourceName, contains
+	//   filtercomponent=resourceName
+	//   matchalgorithm=contains
 	//*********************************************************************
-	public final void test_valuesets_search_resourceSynopsis_contains_call() {
+	public final void test_valuesets_search_filtercomponent_resourceName_matchAlgorithm_contains_call() {
 			
 		RestAssured.
 			when().
-				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&maxtoreturn=50&matchalgorithm=contains&format=json").
+				get("/valuesets?matchvalue=GAIA&filtercomponent=resourceName&matchalgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(22));
+	 }
+		
+	//*********************************************************************
+	// valuesets - search resourceSynopsis, exactMatch
+    //  filtercomponent=resourceSynopsis
+	//   matchalgorithm=exactMatch
+	//*********************************************************************
+	public final void test_valuesets_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
+		
+		RestAssured.
+			when().
+				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(0));
+	 }
+				
+	//*********************************************************************
+	// valuesets - search resourceSynopsis, contains
+    //  filtercomponent=resourceSynopsis
+	//   matchalgorithm=contains
+	//*********************************************************************
+	public final void test_valuesets_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
+			
+		RestAssured.
+			when().
+				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
 			then().
 				assertThat().
 					statusCode(200).
