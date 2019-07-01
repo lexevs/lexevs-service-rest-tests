@@ -892,7 +892,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 	 }
 				
 	//*********************************************************************
-	// mapversions - search resourceName
+	// mapversions - 
 	//  matchvalue=ncit
     //  filtercomponent=resourceName
 	//  entitiesmaprole=MAP_FROM_ROLE
@@ -912,7 +912,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 	 }
 	
 	//*********************************************************************
-	// mapversions - search resourceName
+	// mapversions - 
 	//  matchvalue=ncit
     //  filtercomponent=resourceName
 	//  entitiesmaprole=MAP_TO_ROLE
@@ -932,15 +932,80 @@ public class LexevsRestTestRunnerTest extends TestCase
 	 }
 	
 	//*********************************************************************
-	// mapversions - search resourceSynopsis
-	//   matchvalue=NCIT
-    //   filtercomponent=resourceSynopsis
+	// mapversions - 
+	//  matchvalue=ncit
+    //  filtercomponent=resourceName
+	//  entitiesmaprole=BOTH_MAP_ROLES
 	//*********************************************************************
-	public final void test_mapversions_search_filtercomponent_resourceSynopsis_call() {
+	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_bothMapRoles_call() {
 			
 		RestAssured.
 			when().
-				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&format=json").
+				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=BOTH_MAP_ROLES&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
+						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
+	 }
+	
+	//*********************************************************************
+	// mapversions - search resourceSynopsis
+	//   matchvalue=NCIT
+    //   filtercomponent=resourceSynopsis
+    //   entitiesmaprole=MAP_FROM_ROLE
+	//*********************************************************************
+	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_mapFromRole_call() {
+			
+		RestAssured.
+			when().
+				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_FROM_ROLE&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
+						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.versionOf.content", equalTo("NCIt_to_HGNC_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.formalName", equalTo("NCIt_to_HGNC_Mapping"));
+	 }
+	
+	//*********************************************************************
+	// mapversions - search resourceSynopsis
+	//   matchvalue=NCIT
+    //   filtercomponent=resourceSynopsis
+    //   entitiesmaprole=MAP_TO_ROLE
+	//*********************************************************************
+	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_mapToRole_call() {
+			
+		RestAssured.
+			when().
+				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_TO_ROLE&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
+						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.versionOf.content", equalTo("NCIt_to_HGNC_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.formalName", equalTo("NCIt_to_HGNC_Mapping"));
+	 }
+	
+	//*********************************************************************
+	// mapversions - search resourceSynopsis
+	//   matchvalue=NCIT
+    //   filtercomponent=resourceSynopsis
+    //   entitiesmaprole=BOTH_MAP_ROLES
+	//*********************************************************************
+	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_bothMapRoles_call() {
+			
+		RestAssured.
+			when().
+				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=BOTH_MAP_ROLES&format=json").
 			then().
 				assertThat().
 					statusCode(200).
