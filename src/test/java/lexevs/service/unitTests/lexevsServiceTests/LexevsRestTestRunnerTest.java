@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -90,8 +91,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(50),
-  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'MDR-13.0' }.versionOf.content", equalTo("MDR"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", greaterThanOrEqualTo(42),
+  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'CTCAE_v5-5.0' }.versionOf.content", equalTo("CTCAE_v5"),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'RadLex-3.14' }.versionOf.content", equalTo("RadLex"),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'NDFRT-February2018' }.versionOf.content", equalTo("NDFRT"));
 	}
@@ -123,7 +124,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(8),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'UMLS_SemNet-3.2' }.versionOf.content", equalTo("UMLS_SemNet"),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == '" + THESAURUS_VERSION +"' }.versionOf.content", equalTo("NCI_Thesaurus"),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'NCI Metathesaurus-201808' }.versionOf.content", equalTo("NCI Metathesaurus"));
@@ -162,7 +163,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(4));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
 	}
 	
 	//*********************************************************************
@@ -180,7 +181,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(4));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
 	}
 	
 	//*********************************************************************
@@ -198,7 +199,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(4));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
 	}
 	
 	//*********************************************************************
@@ -216,7 +217,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(4));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
 	}
 	
 	//*********************************************************************
@@ -234,7 +235,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
 	}
 	
 	//*********************************************************************
@@ -252,7 +253,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
 	}
 	
 	//*********************************************************************
@@ -270,7 +271,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
 	}
 	
 	//*********************************************************************
@@ -288,11 +289,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
 	}
-	
-	
-	
 	
 	//*********************************************************************
 	// codeSystemVersion - 
@@ -309,7 +307,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(9));
 	}
 	
 	//*********************************************************************
@@ -386,7 +384,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 						 "EntityDirectory.numEntries", is(50),
 						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C17998' }.name.name", equalTo("C17998"),
 						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C855' }.name.name", equalTo("C855"),
-						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C5964' }.name.name", equalTo("C5964"));
+						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C200' }.name.name", equalTo("C200"));
 	}
 		
 	//*********************************************************************
@@ -402,11 +400,11 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).					
 					body("EntityDirectory.complete", is("COMPLETE"),
 						 "EntityDirectory.numEntries", is(43),
-						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10009269' }.name.name", equalTo("10009269"),
-						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10009276' }.name.name", equalTo("10009276"),
-						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10009264' }.name.name", equalTo("10009264"));
+						 "EntityDirectory.entry.find { it.name.name == '10009269' }.name.namespace", equalTo("MedDRA"),
+						 "EntityDirectory.entry.find { it.name.name == '10009276' }.name.namespace", equalTo("MedDRA"),
+						 "EntityDirectory.entry.find { it.name.name == '10009264' }.name.namespace", equalTo("MedDRA"));
 	}
-	
+	  	 
 	//*********************************************************************
 	// codeSystem entities - search entities - resourceSynopsis, exactMatch 
 	//*********************************************************************
@@ -419,8 +417,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).					
 					body("EntityDirectory.complete", is("COMPLETE"),
-						 "EntityDirectory.numEntries", is(1),
-						 "EntityDirectory.entry.find { it.about == 'http://id.nlm.nih.gov/cui/C1140263/10068280' }.name.name", equalTo("10068280"));
+						 "EntityDirectory.numEntries", is(1));
 	}
 		
 	//*********************************************************************
@@ -493,8 +490,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("PARTIAL"),
   						 "EntityDirectory.numEntries", equalTo(50),
-  						 "EntityDirectory.entry.find { it.name.name = 'C0018798' }.name.namespace ", equalTo("ns1363824265"),
-  						 "EntityDirectory.entry.find { it.name.name = 'C0018827' }.name.namespace ", equalTo("ns1363824265"));
+  						 "EntityDirectory.entry.find { it.name.name = 'C0018798' }.name.namespace ", equalTo("gene_ontology"),
+  						 "EntityDirectory.entry.find { it.name.name = 'C0018827' }.name.namespace ", equalTo("gene_ontology"));
 	}
 	
 	//*********************************************************************
@@ -512,8 +509,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("COMPLETE"),
-  						 "EntityDirectory.numEntries", equalTo(43),
-  						 "EntityDirectory.entry.find { it.name.name = '10019277' }.name.namespace ", equalTo("MDR"));
+  						 "EntityDirectory.numEntries", equalTo(37),
+  						 "EntityDirectory.entry.find { it.name.name = '10019277' }.name.namespace ", equalTo("MedDRA"));
 	}
 	
 	//*********************************************************************
@@ -532,8 +529,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("PARTIAL"),
   						 "EntityDirectory.numEntries", equalTo(50),
-  						 "EntityDirectory.entry.find { it.name.name = '10019277' }.name.namespace ", equalTo("MDR"),
-  					  	 "EntityDirectory.entry.find { it.name.name = '10061158' }.name.namespace ", equalTo("MDR"));
+  						 "EntityDirectory.entry.find { it.name.name = '10019277' }.name.namespace ", equalTo("MedDRA"),
+  					  	 "EntityDirectory.entry.find { it.name.name = '10061158' }.name.namespace ", equalTo("MedDRA"));
 	}
 	
 	//*********************************************************************
@@ -642,9 +639,7 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C875' }.subject.namespace", equalTo("ncit"),  
   						 
   						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.subject.name", equalTo("C157711"),
- 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.predicate.name", equalTo("subClassOf"),
  						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.target.entity.namespace", equalTo("ncit"),
-						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.target.entity.name", equalTo("C292"),
 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.assertedBy.codeSystem.content", equalTo("NCI_Thesaurus"),
 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.assertedBy.codeSystem.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"));
 	}
@@ -666,12 +661,12 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C128784' }.subject.name", equalTo("C128784"),
   						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C128784' }.subject.namespace", equalTo("ncit"),
   						   						 
-  						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.subject.name", equalTo("C105150"),
- 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.predicate.name", equalTo("Concept_In_Subset"),
- 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.target.entity.namespace", equalTo("ncit"),
-						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.target.entity.name", equalTo("C119740"),
-						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.assertedBy.codeSystem.content", equalTo("NCI_Thesaurus"),
-						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.assertedBy.codeSystem.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"));
+  						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.subject.name", equalTo("C100099"),
+ 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.predicate.name", equalTo("Concept_In_Subset"),
+ 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.target.entity.namespace", equalTo("ncit"),
+						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.target.entity.name", equalTo("C100101"),
+						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.assertedBy.codeSystem.content", equalTo("NCI_Thesaurus"),
+						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.assertedBy.codeSystem.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"));
 	}
 	
 	
@@ -693,9 +688,9 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'NCIt Neoplasm Core Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("ed0a1ca6"),
   					  	 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'NCIt Neoplasm Core Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/C126659"),
   						 
-		                 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CDISC Questionnaire AIMS Test Code Terminology' }.about", equalTo("http://evs.nci.nih.gov/valueset/CDISC/C101805"),
-			             "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CDISC Questionnaire AIMS Test Code Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("d97ef78d"),
-		  	             "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CDISC Questionnaire AIMS Test Code Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/CDISC/C101805"));
+		                 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CTS-API Disease Broad Category Terminology' }.about", equalTo("http://evs.nci.nih.gov/valueset/C138189"),
+			             "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CTS-API Disease Broad Category Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("80542aed"),
+		  	             "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CTS-API Disease Broad Category Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/C138189"));
 	 }
 	
 	//*********************************************************************
@@ -1069,7 +1064,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 						 						 
 						 "MapVersionMsg.mapVersion.versionOf.content", equalTo("NCIt_to_ChEBI_Mapping"),
 						 "MapVersionMsg.mapVersion.fromCodeSystemVersion.codeSystem.content", equalTo("NCI_Thesaurus"),
-						 "MapVersionMsg.mapVersion.toCodeSystemVersion.codeSystem.content", equalTo("chebi"),
+						 "MapVersionMsg.mapVersion.toCodeSystemVersion.codeSystem.content", equalTo("ChEBI"),
 						 
 						 "MapVersionMsg.mapVersion.sourceAndNotation.sourceAndNotationDescription", equalTo("LexEVS"));
 	 }
