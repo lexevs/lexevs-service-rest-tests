@@ -1,16 +1,9 @@
 package lexevs.service.unitTests.lexevsServiceTests;
 
-import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 import io.restassured.RestAssured;
 import junit.framework.Test;
@@ -22,16 +15,18 @@ import junit.framework.TestSuite;
  */
 public class LexevsRestTestRunnerTest extends TestCase
 {
-	// These variables are set from a properties file.
-	public static String BASE_URL=null;
-	public static String BASE_PATH=null;
+	// These variables should be pulled from a properties file.
 	
-	public static String LEXEVS_SERVICE_VERSION=null;
+	public static final String BASE_URL = "https://lexevs65cts2-qa.nci.nih.gov/";
+	public static final String BASE_PATH = "/lexevscts2";
 	
-	public static String THESAURUS_VERSION_NUMBER=null;
-	public static String THESAURUS=null;
-	public static String THESAURUS_VERSION=null;
-		
+	public static final String LEXEVS_SERVICE_VERSION = "1.3.7.FINAL";
+	
+	public static final String THESAURUS_VERSION_NUMBER = "19.10d";
+	public static final String THESAURUS = "NCI_Thesaurus";
+	public static final String THESAURUS_VERSION = THESAURUS + "-" + THESAURUS_VERSION_NUMBER; 
+	
+	
     /**
      * Create the test case
      *
@@ -40,7 +35,6 @@ public class LexevsRestTestRunnerTest extends TestCase
     public LexevsRestTestRunnerTest( String testName )
     {
         super( testName );
-        getProperties();
     }
 
     /**
@@ -52,15 +46,15 @@ public class LexevsRestTestRunnerTest extends TestCase
     }
     
     protected void setUp() throws Exception {
-       	    	
+    	
     	// Default the URL to prod, stage, ...
 		RestAssured.baseURI = BASE_URL;
 		
 		// Default the base path that is appended to the base URL
     	RestAssured.basePath = BASE_PATH;
 	}
-	    
-	//*********************************************************************
+	
+    //*********************************************************************
  	// service
  	//*********************************************************************
 	public final void test_service_call() {
@@ -71,12 +65,10 @@ public class LexevsRestTestRunnerTest extends TestCase
 			then().
 				statusCode(200).
 				body("BaseService.serviceName", hasToString("CTS2 Development Framework RESTWebApp"),
- 					 "BaseService.serviceVersion", hasToString(LEXEVS_SERVICE_VERSION),					 
- 					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_MAP_VERSION' }.functionalProfile.content", anyOf(hasItems("FP_QUERY"),hasItems("FP_READ")),
- 					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_VALUE_SET_DEFINITION' }.functionalProfile.content", anyOf(hasItems("FP_QUERY"),hasItems("FP_READ")),
-					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ENTITY_DESCRIPTION' }.functionalProfile.content", anyOf(hasItems("FP_QUERY"),hasItems("FP_READ")),
-					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_CODE_SYSTEM_VERSION' }.functionalProfile.content", anyOf(hasItems("FP_QUERY"),hasItems("FP_READ")),
-					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ASSOCIATION' }.functionalProfile.content", anyOf(hasItems("FP_QUERY"),hasItems("FP_READ")));
+					 "BaseService.serviceVersion", hasToString(LEXEVS_SERVICE_VERSION),					 
+					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ENTITY_DESCRIPTION' }.functionalProfile.content", hasItems("FP_QUERY"),
+					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_CODE_SYSTEM_VERSION' }.functionalProfile.content", hasItems("FP_QUERY"),
+					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ASSOCIATION' }.functionalProfile.content", hasItems("FP_QUERY"));
 	}
 	
 	//*********************************************************************
@@ -91,25 +83,10 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", greaterThanOrEqualTo(42),
-  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'CTCAE_v5-5.0' }.versionOf.content", equalTo("CTCAE_v5"),
-  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'RadLex-3.14' }.versionOf.content", equalTo("RadLex"),
-  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'NDFRT-February2018' }.versionOf.content", equalTo("NDFRT"));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - search on unknown value.  Should get return of 0
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_return_none_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=foot&filtercomponent=resourceSynopsis&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(20),
+  						"CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName =='ICD-10-2010'}.formalName", equalTo("ICD-10"),
+  						"CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName =='MedDRA-18.1'}.formalName", equalTo("MedDRA (Medical Dictionary for Regulatory Activities Terminology)"),
+  						"CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName =='"+ THESAURUS_VERSION +"'}.formalName", equalTo("NCI Thesaurus"));
 	}
 	
 	//*********************************************************************
@@ -124,16 +101,16 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(8),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(3),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'UMLS_SemNet-3.2' }.versionOf.content", equalTo("UMLS_SemNet"),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == '" + THESAURUS_VERSION +"' }.versionOf.content", equalTo("NCI_Thesaurus"),
-  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'NCI Metathesaurus-201808' }.versionOf.content", equalTo("NCI Metathesaurus"));
+  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'NCI Metathesaurus-202003' }.versionOf.content", equalTo("NCI Metathesaurus"));
 	}
 	
 	//*********************************************************************
 	// codeSystemVersion - search exact match on THESAURUS_VERSION
 	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceName_exact_match_call() {
+	public final void test_codeSystemVersion_search_exact_match_call() {
 		
 		RestAssured.
 			when().
@@ -148,204 +125,6 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == '" + THESAURUS_VERSION + "' }.documentURI", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + THESAURUS_VERSION_NUMBER));
 	}
 	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=NCI Thesaurus
-	//	 filtercomponent=resourceSynopsis
-	//	 matchAlgorithm=contains
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=contains&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=NCI Thesaurus
-	//	 filtercomponent=resourceSynopsis
-	//	 matchAlgorithm=exactMatch
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=exactMatch&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=NCI Thesaurus
-	//	 filtercomponent=resourceSynopsis
-	//	 matchAlgorithm=luceneQuery
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_luceneQuery_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=luceneQuery&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=NCI Thesaurus
-	//	 filtercomponent=resourceSynopsis
-	//	 matchAlgorithm=starsWith
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_starsWith_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=startsWith&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(6));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=NCI Thesaurus
-	//	 filtercomponent=resourceName
-	//	 matchAlgorithm=contains
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_contains_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=contains&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=NCI Thesaurus
-	//	 filtercomponent=resourceName
-	//	 matchAlgorithm=exactMatch
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_exactMatch_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=exactMatch&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=NCI Thesaurus
-	//	 filtercomponent=resourceName
-	//	 matchAlgorithm=luceneQuery
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_luceneQuery_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=luceneQuery&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=NCI Thesaurus
-	//	 filtercomponent=resourceName
-	//	 matchAlgorithm=starsWith
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_starsWith_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=startsWith&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(7));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=EVS
-	//	 filtercomponent=about
-	//	 matchAlgorithm=contains
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_contains_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=contains&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(9));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=EVS
-	//	 filtercomponent=about
-	//	 matchAlgorithm=startsWith
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_startsWith_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=startsWith&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
-	}
-	
-	//*********************************************************************
-	// codeSystemVersion - 
-	//	 matchvalue=EVS
-	//	 filtercomponent=about
-	//	 matchAlgorithm=exactMatch
-	//*********************************************************************
-	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_exactMatch_call() {
-		
-		RestAssured.
-			when().
-				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=exactMatch&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
-	}
-
 	
 	//*********************************************************************
 	// codeSystem - retrieve exact match on THESAURUS_VERSION
@@ -370,54 +149,21 @@ public class LexevsRestTestRunnerTest extends TestCase
 	}
 	
 	//*********************************************************************
-	// codeSystem entities - read entities - only 50 from THESAURUS_VERSION 
+	// codeSystem - read entities - only 50 from THESAURUS_VERSION 
 	//*********************************************************************
-	public final void test_entity_search_call() {
+	public final void test_codeSystem_search_call() {
 		
 		RestAssured.
 			when().
-				get("codesystem/NCI_Thesaurus/version/" + THESAURUS_VERSION_NUMBER + "/entities?maxtoreturn=50&format=json").
+				get("codesystem/NCI_Thesaurus/version/" + THESAURUS_VERSION_NUMBER + "/entities?maxtoreturn=10000&format=json").
 			then().
 				assertThat().
 					statusCode(200).					
 					body("EntityDirectory.complete", is("PARTIAL"),
-						 "EntityDirectory.numEntries", is(50),
+						 "EntityDirectory.numEntries", is(10000),
 						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C17998' }.name.name", equalTo("C17998"),
 						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C855' }.name.name", equalTo("C855"),
-						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C200' }.name.name", equalTo("C200"));
-	}
-		
-	//*********************************************************************
-	// codeSystem entities - search entities - resourceSynopsis, contains 
-	//*********************************************************************
-	public final void test_entity_search_resource_synopsis_contains_call() {
-		
-		RestAssured.
-			when().
-				get("codesystem/MedDRA/version/19.0/entities?matchvalue=Cleft&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
-			then().
-				assertThat().
-					statusCode(200).					
-					body("EntityDirectory.complete", is("COMPLETE"),
-						 "EntityDirectory.numEntries", is(43),
-						 "EntityDirectory.entry.find { it.name.name == '10009269' }.name.namespace", equalTo("MedDRA"),
-						 "EntityDirectory.entry.find { it.name.name == '10009276' }.name.namespace", equalTo("MedDRA"),
-						 "EntityDirectory.entry.find { it.name.name == '10009264' }.name.namespace", equalTo("MedDRA"));
-	}
-	  	 
-	//*********************************************************************
-	// codeSystem entities - search entities - resourceSynopsis, exactMatch 
-	//*********************************************************************
-	public final void test_entity_search_resource_synopsis_exact_match_call() {
-		
-		RestAssured.
-			when().
-				get("codesystem/MedDRA/version/19.0/entities?matchvalue=Cleft lip and nose&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&format=json").
-			then().
-				assertThat().
-					statusCode(200).					
-					body("EntityDirectory.complete", is("COMPLETE"),
-						 "EntityDirectory.numEntries", is(1));
+						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C5964' }.name.name", equalTo("C5964"));
 	}
 		
 	//*********************************************************************
@@ -434,6 +180,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 					body("EntityDescriptionMsg.entityDescription.namedEntity.entryState", hasToString("ACTIVE"),
 						 "EntityDescriptionMsg.entityDescription.namedEntity.about", hasToString("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C938"),	
 						 "EntityDescriptionMsg.entityDescription.namedEntity.entityID.namespace", hasToString("ncit"),
+						 "EntityDescriptionMsg.entityDescription.namedEntity.entityID.name", hasToString("C938"),
 						 "EntityDescriptionMsg.entityDescription.namedEntity.entityID.name", hasToString("C938"),
 						 "EntityDescriptionMsg.entityDescription.namedEntity.describingCodeSystemVersion.version.content", hasToString(THESAURUS_VERSION),
 						 "EntityDescriptionMsg.entityDescription.namedEntity.describingCodeSystemVersion.codeSystem.content", hasToString("NCI_Thesaurus"),
@@ -457,50 +204,28 @@ public class LexevsRestTestRunnerTest extends TestCase
 	}
 	
 	//*********************************************************************
-	// entities - search all for non-existing value
-	//   matchvalue=abcdef
-	//   filtercomponent=resourceSynopsis
-	//   matchalgorithm=contains
-	//*********************************************************************
-	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_invalid_value_call() {
-		
-		RestAssured.
-			when().
-				get("/entities?matchvalue=abcdef&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("EntityDirectory.complete", hasToString("COMPLETE"),
-  						 "EntityDirectory.numEntries", equalTo(0));
-	}
-	
-	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - luceneQuery
-	//   matchvalue=heart
-	//   filtercomponent=resourceSynopsis
-	//   matchalgorithm=luceneQuery
 	//*********************************************************************
-	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_luceneQuery_call() {
+	public final void test_entities_search_resource_synopsis_lucene_call() {
 		
 		RestAssured.
 			when().
-				get("/entities?matchvalue=heart&filtercomponent=resourceSynopsis&matchalgorithm=luceneQuery&maxtoreturn=50&format=json").
+				get("/entities?matchvalue=heart&filtercomponent=resourceSynopsis&matchalgorithm=luceneQuery&format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("PARTIAL"),
-  						 "EntityDirectory.numEntries", equalTo(50),
-  						 "EntityDirectory.entry.find { it.name.name = 'C0018798' }.name.namespace ", equalTo("gene_ontology"),
-  						 "EntityDirectory.entry.find { it.name.name = 'C0018827' }.name.namespace ", equalTo("gene_ontology"));
+  						 "EntityDirectory.numEntries", equalTo(1000),
+  						 "EntityDirectory.entry.name.namespace[0]", equalTo("ns1363824265"),
+  						 "EntityDirectory.entry.name.name[0]", equalTo("C0018798"),
+  						"EntityDirectory.entry.find { it.name.name = 'C0018827'}.name.namespace", equalTo("ns1363824265"),
+ 						 "EntityDirectory.entry.find { it.name.name = 'C0018827'}.name.name", equalTo("C0018827"));
 	}
 	
 	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - exactMatch
-	//   matchvalue=Heart disorder
-	//   filtercomponent=resourceSynopsis
-	//   matchalgorithm=exactMatch
 	//*********************************************************************
-	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
+	public final void test_entities_search_resource_synopsis_exact_match_call() {
 		
 		RestAssured.
 			when().
@@ -509,17 +234,15 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("COMPLETE"),
-  						 "EntityDirectory.numEntries", equalTo(37),
-  						 "EntityDirectory.entry.find { it.name.name = '10019277' }.name.namespace ", equalTo("MedDRA"));
+  						 "EntityDirectory.numEntries", equalTo(14),
+ 						 "EntityDirectory.entry[1].name.namespace", equalTo("MedDRA"),
+							"EntityDirectory.entry[1].name.name", equalTo("10019277"));
 	}
 	
 	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - contains
-	//   matchvalue=Heart disorder
-	//   filtercomponent=resourceSynopsis
-	//   matchalgorithm=contains
 	//*********************************************************************
-	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
+	public final void test_entities_search_resource_synopsis_contains_call() {
 		
 		RestAssured.
 			when().
@@ -529,71 +252,45 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("PARTIAL"),
   						 "EntityDirectory.numEntries", equalTo(50),
-  						 "EntityDirectory.entry.find { it.name.name = '10019277' }.name.namespace ", equalTo("MedDRA"),
-  					  	 "EntityDirectory.entry.find { it.name.name = '10061158' }.name.namespace ", equalTo("MedDRA"));
+  						 "EntityDirectory.entry[1].name.namespace", equalTo("MedDRA"),
+							"EntityDirectory.entry[1].name.name", equalTo("10019277"),
+	  						 "EntityDirectory.entry[3].name.namespace", equalTo("ns1363824265"),
+								"EntityDirectory.entry[3].name.name", equalTo("C0018799"));
 	}
-	
+			
 	//*********************************************************************
 	// entities - search resourceName, matchalgorithm - contains
 	// 
-	//   matchvalue=Heart disorder
-	//   filtercomponent=resourceName
-	//   matchalgorithm=luceneQuery
-	//*********************************************************************
-	public final void test_entities_search_filtercomponent_resourceName_matchAlgorithm_luceneQuery_call() {
-		
-		RestAssured.
-			when().
-				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=luceneQuery&maxtoreturn=50&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("EntityDirectory.complete", hasToString("PARTIAL"),
-  						 "EntityDirectory.numEntries", equalTo(50),
-  						 "EntityDirectory.entry.find { it.name.name = 'C1263846' }.name.namespace ", equalTo("ns1363824265"),
-  					  	 "EntityDirectory.entry.find { it.name.name = 'C0037274' }.name.namespace ", equalTo("ns1363824265"));
-	}
-	
-	//*********************************************************************
-	// entities - search resourceName, matchalgorithm - contains
-	// 
-	//   matchvalue=Heart disorder
-	//   filtercomponent=resourceName
-	//   matchalgorithm=exactMatch
-	//
-	// ** Searches the designation for any part of the match value.  
-	// ** Appears to match on "disorder" and ignores the "heart" part of it.
-	// ** To see all designations, you need to retrieve the entity itself.
-	//*********************************************************************
-	public final void test_entities_search_filtercomponent_resourceName_matchAlgorithm_exactMatch_call() {
-		
-		RestAssured.
-			when().
-				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=exactMatch&maxtoreturn=50&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("EntityDirectory.complete", hasToString("PARTIAL"),
-  						 "EntityDirectory.numEntries", equalTo(50),
-  						 "EntityDirectory.entry.find { it.name.name = 'C1263846' }.name.namespace ", equalTo("ns1363824265"),
-  					  	 "EntityDirectory.entry.find { it.name.name = 'C0037274' }.name.namespace ", equalTo("ns1363824265"));
-	}
-	
-	//*********************************************************************
-	// entities - search resourceName, matchalgorithm - contains
-	// 
-	//   matchvalue=Heart disorder
-	//   filtercomponent=resourceName
-	//   matchalgorithm=contains
-	//
 	// ** Searches the designation for any part of the match value.  
 	// ** To see all designations, you need to retrieve the entity itself.
 	//*********************************************************************
-	public final void test_entities_search_filtercomponent_resourceName_matchAlgorithm_contains_call() {
+	public final void test_entities_search_resource_name_contains_call() {
 		
 		RestAssured.
 			when().
 				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=contains&maxtoreturn=50&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("EntityDirectory.complete", hasToString("PARTIAL"),
+  						 "EntityDirectory.numEntries", equalTo(50),
+  						 "EntityDirectory.entry.find { it.name.name = 'C1263846' }.name.namespace ", equalTo("ns1363824265"),
+  					  	 "EntityDirectory.entry.find { it.name.name = 'C0037274' }.name.namespace ", equalTo("ns1363824265"));
+	}
+	
+	//*********************************************************************
+	// entities - search resourceName, matchalgorithm - exactMatch
+	// 
+	// ** Searches the designation for the match value.  
+	// ** To see all designations, you need to retrieve the entity itself.
+	//
+	// ** ???? This seems to be doing a contains, not an exact match  ????
+	//*********************************************************************
+	public final void test_entities_search_resource_name_exact_match_call() {
+		
+		RestAssured.
+			when().
+				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=exactMatch&maxtoreturn=50&format=json").
 			then().
 				assertThat().
 					statusCode(200).
@@ -636,10 +333,12 @@ public class LexevsRestTestRunnerTest extends TestCase
 					body("AssociationDirectory.complete", hasToString("COMPLETE"),
   						 "AssociationDirectory.numEntries", equalTo(7),
   						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C875' }.subject.name", equalTo("C875"),
-  						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C875' }.subject.namespace", equalTo("ncit"),  
-  						 
+  						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C875' }.subject.namespace", equalTo("ncit"),
+  						   						 
   						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.subject.name", equalTo("C157711"),
+ 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.predicate.name", equalTo("Concept_In_Subset"),
  						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.target.entity.namespace", equalTo("ncit"),
+						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.target.entity.name", equalTo("C63923"),
 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.assertedBy.codeSystem.content", equalTo("NCI_Thesaurus"),
 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C157711' }.assertedBy.codeSystem.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"));
 	}
@@ -652,21 +351,21 @@ public class LexevsRestTestRunnerTest extends TestCase
 		
 		RestAssured.
 			when().
-				get("/codesystem/NCI_Thesaurus/version/" + THESAURUS_VERSION_NUMBER + "/entity/ncit:C128784/targetof?maxtoreturn=50&format=json").
+				get("/codesystem/NCI_Thesaurus/version/" + THESAURUS_VERSION_NUMBER + "/entity/ncit:C128784/targetof?format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("AssociationDirectory.complete", hasToString("PARTIAL"),
-  						 "AssociationDirectory.numEntries", equalTo(50),
+  						 "AssociationDirectory.numEntries", equalTo(1000),
   						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C128784' }.subject.name", equalTo("C128784"),
   						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C128784' }.subject.namespace", equalTo("ncit"),
   						   						 
-  						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.subject.name", equalTo("C100099"),
- 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.predicate.name", equalTo("Concept_In_Subset"),
- 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.target.entity.namespace", equalTo("ncit"),
-						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.target.entity.name", equalTo("C100101"),
-						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.assertedBy.codeSystem.content", equalTo("NCI_Thesaurus"),
-						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C100099' }.assertedBy.codeSystem.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"));
+  						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.subject.name", equalTo("C105150"),
+ 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.predicate.name", equalTo("Concept_In_Subset"),
+ 						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.target.entity.namespace", equalTo("ncit"),
+						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.target.entity.name", equalTo("C1052"),
+						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.assertedBy.codeSystem.content", equalTo("NCI_Thesaurus"),
+						 "AssociationDirectory.entry.find { it.subject.uri == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C105150' }.assertedBy.codeSystem.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"));
 	}
 	
 	
@@ -677,20 +376,20 @@ public class LexevsRestTestRunnerTest extends TestCase
 			
 		RestAssured.
 			when().
-				get("/valuesets?maxtoreturn=50&format=json").
+				get("/valuesets?format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("ValueSetCatalogEntryDirectory.complete", hasToString("PARTIAL"),
-  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(50),
+  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(1000),
   						 
   						 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'NCIt Neoplasm Core Terminology' }.about", equalTo("http://evs.nci.nih.gov/valueset/C126659"),
   						 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'NCIt Neoplasm Core Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("ed0a1ca6"),
   					  	 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'NCIt Neoplasm Core Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/C126659"),
   						 
-		                 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CTS-API Disease Broad Category Terminology' }.about", equalTo("http://evs.nci.nih.gov/valueset/C138189"),
-			             "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CTS-API Disease Broad Category Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("80542aed"),
-		  	             "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CTS-API Disease Broad Category Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/C138189"));
+		                 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CDISC Clinical Classification AIMS Test Code Terminology' }.about", equalTo("http://evs.nci.nih.gov/valueset/CDISC/C101805"),
+			             "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CDISC Clinical Classification AIMS Test Code Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("d97ef78d"),
+		  	             "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CDISC Clinical Classification AIMS Test Code Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/CDISC/C101805"));
 	 }
 	
 	//*********************************************************************
@@ -712,10 +411,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 	
 	//*********************************************************************
 	// valuesets - search resourceName, exact match
-	//   filtercomponent=resourceName
-	//   matchalgorithm=exactMatch
 	//*********************************************************************
-	public final void test_valuesets_search_filtercomponent_resourceName_matchAlgorithm_exactMatch_call() {
+	public final void test_valuesets_search_resourceName_exactMatch_call() {
 			
 		RestAssured.
 			when().
@@ -730,56 +427,21 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'GAIA Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("dbaa9b00"),
   					  	 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'GAIA Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/GAIA/C125481"));
 	 }
-	
-	//*********************************************************************
-	// valuesets - search resourceName, contains
-	//   filtercomponent=resourceName
-	//   matchalgorithm=contains
-	//*********************************************************************
-	public final void test_valuesets_search_filtercomponent_resourceName_matchAlgorithm_contains_call() {
-			
-		RestAssured.
-			when().
-				get("/valuesets?matchvalue=GAIA&filtercomponent=resourceName&matchalgorithm=contains&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(22));
-	 }
 		
-	//*********************************************************************
-	// valuesets - search resourceSynopsis, exactMatch
-    //  filtercomponent=resourceSynopsis
-	//   matchalgorithm=exactMatch
-	//*********************************************************************
-	public final void test_valuesets_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
-		
-		RestAssured.
-			when().
-				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(0));
-	 }
 				
 	//*********************************************************************
 	// valuesets - search resourceSynopsis, contains
-    //  filtercomponent=resourceSynopsis
-	//   matchalgorithm=contains
 	//*********************************************************************
-	public final void test_valuesets_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
+	public final void test_valuesets_search_resourceSynopsis_contains_call() {
 			
 		RestAssured.
 			when().
-				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
+				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&maxtoreturn=50&matchalgorithm=contains&format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(2),
+  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(6),
   						 
   						 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CDISC SDTM Diabetes Therapy Terminology' }.about", equalTo("http://evs.nci.nih.gov/valueset/CDISC/C101857"),
   						 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'CDISC SDTM Diabetes Therapy Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("4a0762e4"),
@@ -828,10 +490,11 @@ public class LexevsRestTestRunnerTest extends TestCase
 					  	 "ValueSetDefinitionMsg.valueSetDefinition.documentURI", equalTo("http://evs.nci.nih.gov/valueset/FDA/C131123"),
 						 "ValueSetDefinitionMsg.valueSetDefinition.state", equalTo("FINAL"),
 						 "ValueSetDefinitionMsg.valueSetDefinition.entryState", equalTo("ACTIVE"),
-						 "ValueSetDefinitionMsg.valueSetDefinition.entry.find { it.operator == 'UNION' }.associatedEntities.direction", equalTo("TARGET_TO_SOURCE"),
-						 "ValueSetDefinitionMsg.valueSetDefinition.entry.find { it.operator == 'UNION' }.associatedEntities.referencedEntity.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C131123"));
+						 "ValueSetDefinitionMsg.valueSetDefinition.entry[0].operator", equalTo("UNION"),
+						 "ValueSetDefinitionMsg.valueSetDefinition.entry[0].associatedEntities.referencedEntity.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C131123"));
 	 }
 		
+	
 	//*********************************************************************
 	// valuesets - resolved valuesets call 
 	//*********************************************************************
@@ -887,120 +550,30 @@ public class LexevsRestTestRunnerTest extends TestCase
 	 }
 				
 	//*********************************************************************
-	// mapversions - 
-	//  matchvalue=ncit
-    //  filtercomponent=resourceName
-	//  entitiesmaprole=MAP_FROM_ROLE
+	// mapversions - search resourceName
 	//*********************************************************************
-	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_mapFromRole_call() {
+	public final void test_mapversions_search_resource_name_call() {
 			
 		RestAssured.
 			when().
-				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_FROM_ROLE&format=json").
+				get("/mapversions?matchvalue=GO&filtercomponent=resourceName&format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
-						 "MapVersionDirectory.numEntries", equalTo(4),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
-	 }
-	
-	//*********************************************************************
-	// mapversions - 
-	//  matchvalue=ncit
-    //  filtercomponent=resourceName
-	//  entitiesmaprole=MAP_TO_ROLE
-	//*********************************************************************
-	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_mapToRole_call() {
-			
-		RestAssured.
-			when().
-				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_TO_ROLE&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
-						 "MapVersionDirectory.numEntries", equalTo(4),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
-	 }
-	
-	//*********************************************************************
-	// mapversions - 
-	//  matchvalue=ncit
-    //  filtercomponent=resourceName
-	//  entitiesmaprole=BOTH_MAP_ROLES
-	//*********************************************************************
-	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_bothMapRoles_call() {
-			
-		RestAssured.
-			when().
-				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=BOTH_MAP_ROLES&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
-						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.numEntries", equalTo(1),
 						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
 						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
 	 }
 	
 	//*********************************************************************
 	// mapversions - search resourceSynopsis
-	//   matchvalue=NCIT
-    //   filtercomponent=resourceSynopsis
-    //   entitiesmaprole=MAP_FROM_ROLE
 	//*********************************************************************
-	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_mapFromRole_call() {
+	public final void test_mapversions_search_resource_synopsis_call() {
 			
 		RestAssured.
 			when().
-				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_FROM_ROLE&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
-						 "MapVersionDirectory.numEntries", equalTo(4),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.versionOf.content", equalTo("NCIt_to_HGNC_Mapping"),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.formalName", equalTo("NCIt_to_HGNC_Mapping"));
-	 }
-	
-	//*********************************************************************
-	// mapversions - search resourceSynopsis
-	//   matchvalue=NCIT
-    //   filtercomponent=resourceSynopsis
-    //   entitiesmaprole=MAP_TO_ROLE
-	//*********************************************************************
-	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_mapToRole_call() {
-			
-		RestAssured.
-			when().
-				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_TO_ROLE&format=json").
-			then().
-				assertThat().
-					statusCode(200).
-					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
-						 "MapVersionDirectory.numEntries", equalTo(4),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.versionOf.content", equalTo("NCIt_to_HGNC_Mapping"),
-						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.formalName", equalTo("NCIt_to_HGNC_Mapping"));
-	 }
-	
-	//*********************************************************************
-	// mapversions - search resourceSynopsis
-	//   matchvalue=NCIT
-    //   filtercomponent=resourceSynopsis
-    //   entitiesmaprole=BOTH_MAP_ROLES
-	//*********************************************************************
-	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_bothMapRoles_call() {
-			
-		RestAssured.
-			when().
-				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=BOTH_MAP_ROLES&format=json").
+				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&format=json").
 			then().
 				assertThat().
 					statusCode(200).
@@ -1026,7 +599,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 					body("MapCatalogEntryMsg.map.mapName", equalTo("GO_to_NCIt_Mapping"),
 						 "MapCatalogEntryMsg.map.fromCodeSystem.content", equalTo("GO"),
 						 "MapCatalogEntryMsg.map.toCodeSystem.content", equalTo("NCI_Thesaurus"),
-						 "MapCatalogEntryMsg.map.about", equalTo("GO_to_NCIt_Mapping"));
+						 "MapCatalogEntryMsg.map.about", equalTo("GO_to_NCIt_Mapp ing"));
 	 }
 	
 	//*********************************************************************
@@ -1106,45 +679,4 @@ public class LexevsRestTestRunnerTest extends TestCase
 						 "MapEntryMsg.entry.assertedBy.map.content", equalTo("NCIt_to_ChEBI_Mapping"),
 						 "MapEntryMsg.entry.mapFrom.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C1028"));
 	 }
-	
-    /**
-     * Read the properties file and set the variables.
-     */
-    private void getProperties() {
-    	
-    	if (BASE_URL != null) {return;} // properties already set.
-    	    	
-    	InputStream inputStream = null;
-    	
-    	try {
-			Properties prop = new Properties();
-			String propFileName = "config.properties";
- 
-			inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
- 
-			if (inputStream != null) {
-				prop.load(inputStream);
-			} else {
-				throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
-			}
- 
-			// get the property values
-			BASE_URL = prop.getProperty("BASE_URL");
-			BASE_PATH = prop.getProperty("BASE_PATH");
-			LEXEVS_SERVICE_VERSION = prop.getProperty("LEXEVS_SERVICE_VERSION");
-			THESAURUS_VERSION_NUMBER = prop.getProperty("THESAURUS_VERSION_NUMBER");
-			THESAURUS = prop.getProperty("THESAURUS");
-			
-			THESAURUS_VERSION = THESAURUS + "-" + THESAURUS_VERSION_NUMBER; 
-			
-		} catch (Exception e) {
-			System.out.println("Exception: " + e);
-		} finally {
-			try {
-				inputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 }
