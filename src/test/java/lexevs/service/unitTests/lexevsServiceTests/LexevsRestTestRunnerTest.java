@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 import io.restassured.RestAssured;
 import junit.framework.Test;
@@ -83,10 +84,25 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(20),
-  						"CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName =='ICD-10-2010'}.formalName", equalTo("ICD-10"),
-  						"CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName =='MedDRA-18.1'}.formalName", equalTo("MedDRA (Medical Dictionary for Regulatory Activities Terminology)"),
-  						"CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName =='"+ THESAURUS_VERSION +"'}.formalName", equalTo("NCI Thesaurus"));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", greaterThanOrEqualTo(20),
+  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'MedDRA-22_1' }.versionOf.content", equalTo("MedDRA"),
+  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'ChEBI-v186' }.versionOf.content", equalTo("ChEBI"),
+  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'NDFRT-February2018' }.versionOf.content", equalTo("NDFRT"));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - search on unknown value.  Should get return of 0
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_return_none_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=foot&filtercomponent=resourceSynopsis&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
 	}
 	
 	//*********************************************************************
@@ -125,6 +141,203 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == '" + THESAURUS_VERSION + "' }.documentURI", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + THESAURUS_VERSION_NUMBER));
 	}
 	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceSynopsis
+	//	 matchAlgorithm=contains
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(1));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceSynopsis
+	//	 matchAlgorithm=exactMatch
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(1));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceSynopsis
+	//	 matchAlgorithm=luceneQuery
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_luceneQuery_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=luceneQuery&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(1));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceSynopsis
+	//	 matchAlgorithm=starsWith
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceSynopsis_matchAlgorithm_starsWith_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=NCI Thesaurus&filtercomponent=resourceSynopsis&matchAlgorithm=startsWith&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(1));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceName
+	//	 matchAlgorithm=contains
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_contains_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(2));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceName
+	//	 matchAlgorithm=exactMatch
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_exactMatch_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(2));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceName
+	//	 matchAlgorithm=luceneQuery
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_luceneQuery_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=luceneQuery&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(2));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=NCI Thesaurus
+	//	 filtercomponent=resourceName
+	//	 matchAlgorithm=starsWith
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_matchAlgorithm_starsWith_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=Thesaurus&filtercomponent=resourceName&matchAlgorithm=startsWith&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(2));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=EVS
+	//	 filtercomponent=about
+	//	 matchAlgorithm=contains
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_contains_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(2));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=EVS
+	//	 filtercomponent=about
+	//	 matchAlgorithm=startsWith
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_startsWith_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=startsWith&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
+	}
+	
+	//*********************************************************************
+	// codeSystemVersion - 
+	//	 matchvalue=EVS
+	//	 filtercomponent=about
+	//	 matchAlgorithm=exactMatch
+	//*********************************************************************
+	public final void test_codeSystemVersion_search_filtercomponent_about_matchAlgorithm_exactMatch_call() {
+		
+		RestAssured.
+			when().
+				get("/codesystemversions?matchvalue=EVS&filtercomponent=about&matchalgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(0));
+	}
 	
 	//*********************************************************************
 	// codeSystem - retrieve exact match on THESAURUS_VERSION
@@ -163,7 +376,40 @@ public class LexevsRestTestRunnerTest extends TestCase
 						 "EntityDirectory.numEntries", is(10000),
 						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C17998' }.name.name", equalTo("C17998"),
 						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C855' }.name.name", equalTo("C855"),
-						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C5964' }.name.name", equalTo("C5964"));
+						 "EntityDirectory.entry.find { it.about == 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C200' }.name.name", equalTo("C200"));
+	}
+		
+	//*********************************************************************
+	// codeSystem entities - search entities - resourceSynopsis, contains 
+	//*********************************************************************
+	public final void test_entity_search_resource_synopsis_contains_call() {
+		
+		RestAssured.
+			when().
+				get("codesystem/MedDRA/version/22_1/entities?matchvalue=Cleft&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).					
+					body("EntityDirectory.complete", is("COMPLETE"),
+						 "EntityDirectory.numEntries", is(44),
+						 "EntityDirectory.entry.find { it.name.name == '10009269' }.name.namespace", equalTo("MedDRA"),
+						 "EntityDirectory.entry.find { it.name.name == '10009276' }.name.namespace", equalTo("MedDRA"),
+						 "EntityDirectory.entry.find { it.name.name == '10009264' }.name.namespace", equalTo("MedDRA"));
+	}
+	  	 
+	//*********************************************************************
+	// codeSystem entities - search entities - resourceSynopsis, exactMatch 
+	//*********************************************************************
+	public final void test_entity_search_resource_synopsis_exact_match_call() {
+		
+		RestAssured.
+			when().
+				get("codesystem/MedDRA/version/22_1/entities?matchvalue=Cleft lip and nose&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).					
+					body("EntityDirectory.complete", is("COMPLETE"),
+						 "EntityDirectory.numEntries", is(1));
 	}
 		
 	//*********************************************************************
@@ -216,10 +462,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("PARTIAL"),
   						 "EntityDirectory.numEntries", equalTo(1000),
-  						 "EntityDirectory.entry.name.namespace[0]", equalTo("ns1363824265"),
-  						 "EntityDirectory.entry.name.name[0]", equalTo("C0018798"),
-  						"EntityDirectory.entry.find { it.name.name = 'C0018827'}.name.namespace", equalTo("ns1363824265"),
- 						 "EntityDirectory.entry.find { it.name.name = 'C0018827'}.name.name", equalTo("C0018827"));
+  						 "EntityDirectory.entry.find { it.name.name = 'C0018798' }.name.namespace ", equalTo("ns1363824265"),
+  						 "EntityDirectory.entry.find { it.name.name = 'C0018827' }.name.namespace ", equalTo("ns1363824265"));
 	}
 	
 	//*********************************************************************
@@ -235,8 +479,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("COMPLETE"),
   						 "EntityDirectory.numEntries", equalTo(14),
- 						 "EntityDirectory.entry[1].name.namespace", equalTo("MedDRA"),
-							"EntityDirectory.entry[1].name.name", equalTo("10019277"));
+  						 "EntityDirectory.entry[1].name.name", equalTo("10019277"),
+  						 "EntityDirectory.entry[1].name.namespace", equalTo("MedDRA"));
 	}
 	
 	//*********************************************************************
@@ -252,10 +496,29 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("PARTIAL"),
   						 "EntityDirectory.numEntries", equalTo(50),
-  						 "EntityDirectory.entry[1].name.namespace", equalTo("MedDRA"),
-							"EntityDirectory.entry[1].name.name", equalTo("10019277"),
-	  						 "EntityDirectory.entry[3].name.namespace", equalTo("ns1363824265"),
-								"EntityDirectory.entry[3].name.name", equalTo("C0018799"));
+  						 "EntityDirectory.entry[1].name.name",  equalTo("10019277"),
+  						 "EntityDirectory.entry[1].name.namespace", equalTo("MedDRA"));
+	}
+	
+	//*********************************************************************
+	// entities - search resourceName, matchalgorithm - contains
+	// 
+	//   matchvalue=Heart disorder
+	//   filtercomponent=resourceName
+	//   matchalgorithm=luceneQuery
+	//*********************************************************************
+	public final void test_entities_search_filtercomponent_resourceName_matchAlgorithm_luceneQuery_call() {
+		
+		RestAssured.
+			when().
+				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceName&matchalgorithm=luceneQuery&maxtoreturn=50&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("EntityDirectory.complete", hasToString("PARTIAL"),
+  						 "EntityDirectory.numEntries", equalTo(50),
+  						 "EntityDirectory.entry.find { it.name.name = 'C1263846' }.name.namespace ", equalTo("ns1363824265"),
+  					  	 "EntityDirectory.entry.find { it.name.name = 'C0037274' }.name.namespace ", equalTo("ns1363824265"));
 	}
 			
 	//*********************************************************************
