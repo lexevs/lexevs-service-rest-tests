@@ -1,10 +1,16 @@
 package lexevs.service.unitTests.lexevsServiceTests;
 
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import io.restassured.RestAssured;
 import junit.framework.Test;
@@ -18,14 +24,14 @@ public class LexevsRestTestRunnerTest extends TestCase
 {
 	// These variables should be pulled from a properties file.
 	
-	public static final String BASE_URL = "https://lexevs65cts2-qa.nci.nih.gov/";
-	public static final String BASE_PATH = "/lexevscts2";
+	public String BASE_URL = "https://lexevs65cts2-qa.nci.nih.gov/";
+	public String BASE_PATH = "/lexevscts2";
 	
-	public static final String LEXEVS_SERVICE_VERSION = "1.3.7.FINAL";
+	public String LEXEVS_SERVICE_VERSION = "1.3.7.FINAL";
 	
-	public static final String THESAURUS_VERSION_NUMBER = "19.10d";
-	public static final String THESAURUS = "NCI_Thesaurus";
-	public static final String THESAURUS_VERSION = THESAURUS + "-" + THESAURUS_VERSION_NUMBER; 
+	public String THESAURUS_VERSION_NUMBER = "19.10d";
+	public String THESAURUS = "NCI_Thesaurus";
+	public String THESAURUS_VERSION = THESAURUS + "-" + THESAURUS_VERSION_NUMBER; 
 	
 	
     /**
@@ -126,7 +132,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 	//*********************************************************************
 	// codeSystemVersion - search exact match on THESAURUS_VERSION
 	//*********************************************************************
-	public final void test_codeSystemVersion_search_exact_match_call() {
+	public final void test_codeSystemVersion_search_filtercomponent_resourceName_exact_match_call() {
 		
 		RestAssured.
 			when().
@@ -450,9 +456,30 @@ public class LexevsRestTestRunnerTest extends TestCase
 	}
 	
 	//*********************************************************************
-	// entities - search resourceSynopsis, matchalgorithm - luceneQuery
+	// entities - search all for non-existing value
+	//   matchvalue=abcdef
+	//   filtercomponent=resourceSynopsis
+	//   matchalgorithm=contains
 	//*********************************************************************
-	public final void test_entities_search_resource_synopsis_lucene_call() {
+	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_invalid_value_call() {
+		
+		RestAssured.
+			when().
+				get("/entities?matchvalue=abcdef&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("EntityDirectory.complete", hasToString("COMPLETE"),
+  						 "EntityDirectory.numEntries", equalTo(0));
+	}
+	
+	//*********************************************************************
+	// entities - search resourceSynopsis, matchalgorithm - luceneQuery
+	//   matchvalue=heart
+	//   filtercomponent=resourceSynopsis
+	//   matchalgorithm=luceneQuery
+	//*********************************************************************
+	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_luceneQuery_call() {
 		
 		RestAssured.
 			when().
@@ -468,8 +495,11 @@ public class LexevsRestTestRunnerTest extends TestCase
 	
 	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - exactMatch
+	//   matchvalue=Heart disorder
+	//   filtercomponent=resourceSynopsis
+	//   matchalgorithm=exactMatch
 	//*********************************************************************
-	public final void test_entities_search_resource_synopsis_exact_match_call() {
+	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
 		
 		RestAssured.
 			when().
@@ -485,8 +515,11 @@ public class LexevsRestTestRunnerTest extends TestCase
 	
 	//*********************************************************************
 	// entities - search resourceSynopsis, matchalgorithm - contains
+	//   matchvalue=Heart disorder
+	//   filtercomponent=resourceSynopsis
+	//   matchalgorithm=contains
 	//*********************************************************************
-	public final void test_entities_search_resource_synopsis_contains_call() {
+	public final void test_entities_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
 		
 		RestAssured.
 			when().
@@ -674,8 +707,10 @@ public class LexevsRestTestRunnerTest extends TestCase
 	
 	//*********************************************************************
 	// valuesets - search resourceName, exact match
+	//   filtercomponent=resourceName
+	//   matchalgorithm=exactMatch
 	//*********************************************************************
-	public final void test_valuesets_search_resourceName_exactMatch_call() {
+	public final void test_valuesets_search_filtercomponent_resourceName_matchAlgorithm_exactMatch_call() {
 			
 		RestAssured.
 			when().
@@ -690,16 +725,51 @@ public class LexevsRestTestRunnerTest extends TestCase
   						 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'GAIA Terminology' }.currentDefinition.valueSetDefinition.content", equalTo("dbaa9b00"),
   					  	 "ValueSetCatalogEntryDirectory.entry.find { it.valueSetName == 'GAIA Terminology' }.currentDefinition.valueSetDefinition.uri", equalTo("http://evs.nci.nih.gov/valueset/GAIA/C125481"));
 	 }
-		
-				
+	
 	//*********************************************************************
-	// valuesets - search resourceSynopsis, contains
+	// valuesets - search resourceName, contains
+	//   filtercomponent=resourceName
+	//   matchalgorithm=contains
 	//*********************************************************************
-	public final void test_valuesets_search_resourceSynopsis_contains_call() {
+	public final void test_valuesets_search_filtercomponent_resourceName_matchAlgorithm_contains_call() {
 			
 		RestAssured.
 			when().
-				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&maxtoreturn=50&matchalgorithm=contains&format=json").
+				get("/valuesets?matchvalue=GAIA&filtercomponent=resourceName&matchalgorithm=contains&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(22));
+	 }
+		
+	//*********************************************************************
+	// valuesets - search resourceSynopsis, exactMatch
+    //  filtercomponent=resourceSynopsis
+	//   matchalgorithm=exactMatch
+	//*********************************************************************
+	public final void test_valuesets_search_filtercomponent_resourceSynopsis_matchAlgorithm_exactMatch_call() {
+		
+		RestAssured.
+			when().
+				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"),
+  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(0));
+	 }
+				
+	//*********************************************************************
+	// valuesets - search resourceSynopsis, contains
+    //  filtercomponent=resourceSynopsis
+	//   matchalgorithm=contains
+	//*********************************************************************
+	public final void test_valuesets_search_filtercomponent_resourceSynopsis_matchAlgorithm_contains_call() {
+			
+		RestAssured.
+			when().
+				get("/valuesets?matchvalue=diabetes&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
 			then().
 				assertThat().
 					statusCode(200).
@@ -813,30 +883,120 @@ public class LexevsRestTestRunnerTest extends TestCase
 	 }
 				
 	//*********************************************************************
-	// mapversions - search resourceName
+	// mapversions - 
+	//  matchvalue=ncit
+    //  filtercomponent=resourceName
+	//  entitiesmaprole=MAP_FROM_ROLE
 	//*********************************************************************
-	public final void test_mapversions_search_resource_name_call() {
+	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_mapFromRole_call() {
 			
 		RestAssured.
 			when().
-				get("/mapversions?matchvalue=GO&filtercomponent=resourceName&format=json").
+				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_FROM_ROLE&format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
-						 "MapVersionDirectory.numEntries", equalTo(1),
+						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
+	 }
+	
+	//*********************************************************************
+	// mapversions - 
+	//  matchvalue=ncit
+    //  filtercomponent=resourceName
+	//  entitiesmaprole=MAP_TO_ROLE
+	//*********************************************************************
+	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_mapToRole_call() {
+			
+		RestAssured.
+			when().
+				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_TO_ROLE&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
+						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
+	 }
+	
+	//*********************************************************************
+	// mapversions - 
+	//  matchvalue=ncit
+    //  filtercomponent=resourceName
+	//  entitiesmaprole=BOTH_MAP_ROLES
+	//*********************************************************************
+	public final void test_mapversions_search_filtercomponent_resourceName_entitiesMapRole_bothMapRoles_call() {
+			
+		RestAssured.
+			when().
+				get("/mapversions?matchvalue=ncit&filtercomponent=resourceSynopsis&entitiesmaprole=BOTH_MAP_ROLES&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
+						 "MapVersionDirectory.numEntries", equalTo(4),
 						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
 						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"));
 	 }
 	
 	//*********************************************************************
 	// mapversions - search resourceSynopsis
+	//   matchvalue=NCIT
+    //   filtercomponent=resourceSynopsis
+    //   entitiesmaprole=MAP_FROM_ROLE
 	//*********************************************************************
-	public final void test_mapversions_search_resource_synopsis_call() {
+	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_mapFromRole_call() {
 			
 		RestAssured.
 			when().
-				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&format=json").
+				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_FROM_ROLE&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
+						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.versionOf.content", equalTo("NCIt_to_HGNC_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.formalName", equalTo("NCIt_to_HGNC_Mapping"));
+	 }
+	
+	//*********************************************************************
+	// mapversions - search resourceSynopsis
+	//   matchvalue=NCIT
+    //   filtercomponent=resourceSynopsis
+    //   entitiesmaprole=MAP_TO_ROLE
+	//*********************************************************************
+	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_mapToRole_call() {
+			
+		RestAssured.
+			when().
+				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=MAP_TO_ROLE&format=json").
+			then().
+				assertThat().
+					statusCode(200).
+					body("MapVersionDirectory.complete", equalTo("COMPLETE"),
+						 "MapVersionDirectory.numEntries", equalTo(4),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.versionOf.content", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'GO_to_NCIt_Mapping-1.1' }.formalName", equalTo("GO_to_NCIt_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.versionOf.content", equalTo("NCIt_to_HGNC_Mapping"),
+						 "MapVersionDirectory.entry.find { it.mapVersionName == 'NCIt_to_HGNC_Mapping-1.0' }.formalName", equalTo("NCIt_to_HGNC_Mapping"));
+	 }
+	
+	//*********************************************************************
+	// mapversions - search resourceSynopsis
+	//   matchvalue=NCIT
+    //   filtercomponent=resourceSynopsis
+    //   entitiesmaprole=BOTH_MAP_ROLES
+	//*********************************************************************
+	public final void test_mapversions_search_filtercomponent_resourceSynopsisentitiesMapRole_bothMapRoles_call() {
+			
+		RestAssured.
+			when().
+				get("/mapversions?matchvalue=NCIT&filtercomponent=resourceSynopsis&entitiesmaprole=BOTH_MAP_ROLES&format=json").
 			then().
 				assertThat().
 					statusCode(200).
@@ -942,4 +1102,45 @@ public class LexevsRestTestRunnerTest extends TestCase
 						 "MapEntryMsg.entry.assertedBy.map.content", equalTo("NCIt_to_ChEBI_Mapping"),
 						 "MapEntryMsg.entry.mapFrom.uri", equalTo("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C1028"));
 	 }
+	
+    /**
+     * Read the properties file and set the variables.
+     */
+    private void getProperties() {
+    	
+    	if (BASE_URL != null) {return;} // properties already set.
+    	    	
+    	InputStream inputStream = null;
+    	
+    	try {
+			Properties prop = new Properties();
+			String propFileName = "config.properties";
+ 
+			inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+ 
+			if (inputStream != null) {
+				prop.load(inputStream);
+			} else {
+				throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+			}
+ 
+			// get the property values
+			BASE_URL = prop.getProperty("BASE_URL");
+			BASE_PATH = prop.getProperty("BASE_PATH");
+			LEXEVS_SERVICE_VERSION = prop.getProperty("LEXEVS_SERVICE_VERSION");
+			THESAURUS_VERSION_NUMBER = prop.getProperty("THESAURUS_VERSION_NUMBER");
+			THESAURUS = prop.getProperty("THESAURUS");
+			
+			THESAURUS_VERSION = THESAURUS + "-" + THESAURUS_VERSION_NUMBER; 
+			
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		} finally {
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
