@@ -73,8 +73,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 				statusCode(200).
 				body("BaseService.serviceName", hasToString("CTS2 Development Framework RESTWebApp"),
 					 "BaseService.serviceVersion", hasToString(LEXEVS_SERVICE_VERSION),					 
-					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ENTITY_DESCRIPTION' }.functionalProfile.content", hasItems("FP_QUERY"),
-					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_CODE_SYSTEM_VERSION' }.functionalProfile.content", hasItems("FP_QUERY"),
+					 "BaseService.supportedProfile[0].functionalProfile.content", hasItems("FP_QUERY"),
+					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_CODE_SYSTEM_VERSION' }.functionalProfile.content", hasItems("FP_READ"),	 
 					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ASSOCIATION' }.functionalProfile.content", hasItems("FP_QUERY"));
 	}
 	
@@ -306,7 +306,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(2));
+  						 "CodeSystemVersionCatalogEntryDirectory.numEntries", equalTo(3));
 	}
 	
 	//*********************************************************************
