@@ -21,7 +21,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 	public static final String BASE_URL = "https://lexevscts2-dev.nci.nih.gov/";
 	public static final String BASE_PATH = "/lexevscts2";
 	
-	public static final String LEXEVS_SERVICE_VERSION = "1.3.9.FINAL";
+	public static final String LEXEVS_SERVICE_VERSION = "2.0.0.FINAL";
 	
 	public static final String THESAURUS_VERSION_NUMBER = "22.08e";
 	public static final String THESAURUS = "NCI_Thesaurus";
@@ -67,8 +67,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 				statusCode(200).
 					body("BaseService.serviceName", hasToString("CTS2 Development Framework RESTWebApp"),
 					 "BaseService.serviceVersion", hasToString(LEXEVS_SERVICE_VERSION),					 
-					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ENTITY_DESCRIPTION' }.functionalProfile.content", hasItems("FP_QUERY"),
-					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_CODE_SYSTEM_VERSION' }.functionalProfile.content", hasItems("FP_READ"),
+					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ENTITY_DESCRIPTION' }.functionalProfile.content", hasItems("FP_READ"),
+					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_CODE_SYSTEM_VERSION' }.functionalProfile.content", hasItems("FP_QUERY"),
 					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ASSOCIATION' }.functionalProfile.content", hasItems("FP_QUERY"));
 	}
 	
@@ -85,7 +85,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).
 					body("CodeSystemVersionCatalogEntryDirectory.complete", hasToString("COMPLETE"),
   						 "CodeSystemVersionCatalogEntryDirectory.numEntries", greaterThanOrEqualTo(20),
-  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'MDR-22_1' }.versionOf.content", equalTo("MDR"),
+  						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'MedDRA-22_1' }.versionOf.content", equalTo("MedDRA"),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'ChEBI-v213' }.versionOf.content", equalTo("ChEBI"),
   						 "CodeSystemVersionCatalogEntryDirectory.entry.find { it.codeSystemVersionName == 'NDFRT-February2018' }.versionOf.content", equalTo("NDFRT"));
 	}
@@ -392,9 +392,9 @@ public class LexevsRestTestRunnerTest extends TestCase
 					statusCode(200).					
 					body("EntityDirectory.complete", is("COMPLETE"),
 						 "EntityDirectory.numEntries", is(44),
-						 "EntityDirectory.entry.find { it.name.name == '10009269' }.name.namespace", equalTo("MDR"),
-						 "EntityDirectory.entry.find { it.name.name == '10009276' }.name.namespace", equalTo("MDR"),
-						 "EntityDirectory.entry.find { it.name.name == '10009264' }.name.namespace", equalTo("MDR"));
+						 "EntityDirectory.entry.find { it.name.name == '10009269' }.name.namespace", equalTo("MedDRA"),
+						 "EntityDirectory.entry.find { it.name.name == '10009276' }.name.namespace", equalTo("MedDRA"),
+						 "EntityDirectory.entry.find { it.name.name == '10009264' }.name.namespace", equalTo("MedDRA"));
 	}
 	  	 
 	//*********************************************************************
@@ -496,7 +496,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 				assertThat().
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("COMPLETE"),
-  						 "EntityDirectory.numEntries", equalTo(38),
+  						 "EntityDirectory.numEntries", equalTo(42),
   						 "EntityDirectory.entry[1].name.name", equalTo("10019277"),
   						 "EntityDirectory.entry[1].name.namespace", equalTo("MedDRA"));
 	}
