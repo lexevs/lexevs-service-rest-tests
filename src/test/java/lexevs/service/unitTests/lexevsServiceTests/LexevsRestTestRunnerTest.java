@@ -18,12 +18,12 @@ public class LexevsRestTestRunnerTest extends TestCase
 {
 	// These variables should be pulled from a properties file.
 	
-	public static final String BASE_URL = "https://lexevscts2-dev.nci.nih.gov/";
+	public static final String BASE_URL = "https://lexevscts2-qa.nci.nih.gov/";
 	public static final String BASE_PATH = "/lexevscts2";
 	
-	public static final String LEXEVS_SERVICE_VERSION = "2.0.0.FINAL";
+	public static final String LEXEVS_SERVICE_VERSION = "2.1.RC3";
 	
-	public static final String THESAURUS_VERSION_NUMBER = "22.08e";
+	public static final String THESAURUS_VERSION_NUMBER = "22.12d";
 	public static final String THESAURUS = "NCI_Thesaurus";
 	public static final String THESAURUS_VERSION = THESAURUS + "-" + THESAURUS_VERSION_NUMBER; 
 	
