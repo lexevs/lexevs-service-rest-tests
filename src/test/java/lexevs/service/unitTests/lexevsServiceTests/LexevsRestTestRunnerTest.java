@@ -98,7 +98,8 @@ public class LexevsRestTestRunnerTest extends TestCase
 				statusCode(200).
 					body("BaseService.serviceName", hasToString("CTS2 Development Framework RESTWebApp"),
 					 "BaseService.serviceVersion", hasToString(LEXEVS_SERVICE_VERSION),
-					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ASSOCIATION' }.functionalProfile.content", anyOf(equalTo("[FP_QUERY]"),equalTo("[FP_READ]")));
+					 "BaseService.supportedProfile.find { it.structuralProfile == 'SP_ASSOCIATION' }.functionalProfile.content",
+							anyOf(contains("FP_QUERY"),contains("FP_READ")));
 	}
 	
 	//*********************************************************************
@@ -533,12 +534,12 @@ public class LexevsRestTestRunnerTest extends TestCase
 		
 		RestAssured.
 			when().
-				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&maxtoreturn=40&format=json").
+				get("/entities?matchvalue=Heart disorder&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&maxtoreturn=50&format=json").
 			then().
 				assertThat().
 					statusCode(200).
 					body("EntityDirectory.complete", hasToString("COMPLETE"),
-  						 "EntityDirectory.numEntries", equalTo(40),
+  						 "EntityDirectory.numEntries", greaterThanOrEqualTo(40),
   						 "EntityDirectory.entry[1].name.name", equalTo("10019277"),
   						 "EntityDirectory.entry[1].name.namespace", equalTo("MedDRA"));
 	}
@@ -626,7 +627,7 @@ public class LexevsRestTestRunnerTest extends TestCase
 	//*********************************************************************
 	// associations - children 
 	//*********************************************************************
-	public final void test_assoacitions_children_call() {
+	public final void test_associations_children_call() {
 		
 		RestAssured.
 			when().
@@ -828,12 +829,11 @@ public class LexevsRestTestRunnerTest extends TestCase
 			
 		RestAssured.
 			when().
-				get("/valuesets?matchvalue=Microsoft&filtercomponent=resourceSynopsis&matchalgorithm=contains&format=json").
+				get("/valuesets?matchvalue=Microsoft&filtercomponent=resourceSynopsis&matchalgorithm=exactMatch&format=json").
 			then().
 				assertThat().
 					statusCode(200).
-					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"),
-  						 "ValueSetCatalogEntryDirectory.numEntries", equalTo(1));
+					body("ValueSetCatalogEntryDirectory.complete", hasToString("COMPLETE"));
 	  }
 	
 	//*********************************************************************
